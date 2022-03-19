@@ -29,13 +29,8 @@ const RenterSchema = {
   // nftId, paymentDate, rentAmount
   // should return bool if it succeeded
   payRent: Fun([Object({ paymentDate: UInt, rent: Rent })], Bool),
+  claimRent: Fun([UInt], Token),
   getRentersPayments: Fun([], RentersPayment),
-};
-
-const ManageRentingSchema = {
-  // keep track of payment and return ownership if renter didn't pay after deadline
-  // removed renters
-  checkPayments: Fun([], Null), // should return array of address
 };
 
 export const main = Reach.App(() => {
@@ -45,9 +40,7 @@ export const main = Reach.App(() => {
   const Renter = Participant("Renter", {
     ...RenterSchema,
   });
-  const ManageRenting = API("ManageRenting", {
-    ...ManageRentingSchema,
-  });
+
   init();
 
   Owner.only(() => {
