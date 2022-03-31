@@ -1,8 +1,1 @@
-{
-    "files.associations": {
-        "*.rsh": "javascript"
-    },
-    "cSpell.words": [
-        "Devnet"
-    ]
-}
+{"files.associations":{"*.rsh":"javascript"},"cSpell.words":["Devnet"]}
