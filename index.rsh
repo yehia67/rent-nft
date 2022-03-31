@@ -40,17 +40,12 @@ export const main = Reach.App(() => {
   });
 
   init();
-
-  Owner.only(() => {
-    const rentedNfts = declassify(interact.rentNFT({}));
-  });
-  Owner.publish(rentedNfts);
+  Owner.publish();
+  const rentedNFTs = new Map(Rent);
   commit();
 
-  Renter.only(() => {
-    const rentersPayment = declassify(interact.getRenterPaymentByDate(0));
-  });
-  Renter.publish(rentersPayment);
+  Renter.publish();
+  const rentersPayment = new Map(RentersPayment);
   commit();
 
   exit();
