@@ -1,6 +1,6 @@
 "reach 0.1";
 // nftId => owner,renter
-const RentedNfts = Tuple(UInt, Object({ owner: Address, renter: Address }));
+const RentedNfts = Object({ owner: Address, renter: Address });
 
 const Rent = Object({
   nftId: UInt,
@@ -8,7 +8,7 @@ const Rent = Object({
   rentAmount: UInt,
 });
 // payment date => rent
-const RentersPayment = Tuple(UInt, Object({ rent: Rent, hasPayed: Bool }));
+const RentersPayment = Object({ rent: Rent, hasPayed: Bool });
 
 const NewRentedNft = Object({
   nftId: UInt,
@@ -22,15 +22,13 @@ const OwnerSchema = {
   // nftId,owner,renter, renting amount, payment dates
   // should return bool if it succeeded
   rentNFT: Fun([NewRentedNft], Bool),
-  getRentedNfts: Fun([], RentedNfts),
+  claimNft: Fun([UInt], Bool),
 };
 
 const RenterSchema = {
   // nftId, paymentDate, rentAmount
   // should return bool if it succeeded
   payRent: Fun([Object({ paymentDate: UInt, rent: Rent })], Bool),
-  claimRent: Fun([UInt], Token),
-  getRentersPayments: Fun([], RentersPayment),
 };
 
 export const main = Reach.App(() => {
@@ -44,13 +42,13 @@ export const main = Reach.App(() => {
   init();
 
   Owner.only(() => {
-    const rentedNfts = declassify(interact.getRentedNfts());
+    const rentedNfts = declassify(interact.rentNFT({}));
   });
   Owner.publish(rentedNfts);
   commit();
 
   Renter.only(() => {
-    const rentersPayment = declassify(interact.getRentersPayments());
+    const rentersPayment = declassify(interact.getRenterPaymentByDate(0));
   });
   Renter.publish(rentersPayment);
   commit();
