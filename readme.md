@@ -49,11 +49,12 @@ What will happen then?
 2.  Pay `rentAmount` to the smart contract.
 3.  Set renter payment status:
     ```
-       rentersPayment[paymentDate].map((rent) =>{
-        if(rent.tokenID === tokenID && rent.renter === renter){
-       return rent.hasPayed = true;
-       }
-       })
+    rentersPayment[paymentDate] = {
+      nftId,
+      renter,
+      rentAmount,
+      hasPayed: true,
+    };
     ```
 
 - NFT owner submit `claimRent` with `nftId`
