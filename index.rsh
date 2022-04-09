@@ -1,7 +1,5 @@
 "reach 0.1";
 // nftId => owner,renter
-const RentedNfts = Object({ owner: Address, renter: Address });
-
 const Rent = Object({
   nftId: UInt,
   renter: Address,
@@ -35,17 +33,17 @@ export const main = Reach.App(() => {
   const Owner = Participant("Owner", {
     ...OwnerSchema,
   });
+
   const Renter = Participant("Renter", {
     ...RenterSchema,
   });
 
   init();
+
   Owner.publish();
-  const rentedNFTs = new Map(Rent);
   commit();
 
   Renter.publish();
-  const rentersPayment = new Map(RentersPayment);
   commit();
 
   exit();

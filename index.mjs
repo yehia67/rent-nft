@@ -91,6 +91,7 @@ await ctcOwner.participants.Owner({
   },
   claimNft: (nftId) => {
     // msg.sender in Reach?
+    stdlib.getAddress();
     const todayInMillisecond = Date.now().getTime() * 1000;
     for (let i = 0; i < rentedNfts[nftId].paymentDates.length; i++) {
       if (todayInMillisecond > rentedNfts[nftId].paymentDates[i]) {
