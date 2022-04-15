@@ -1,20 +1,23 @@
 "reach 0.1";
 // nftId => owner,renter
-const Rent = Object({
-  nftId: UInt,
-  renter: Address,
-  rentAmount: UInt,
-});
+const Rent = Struct([
+  ["nftId", UInt],
+  ["renter", Address],
+  ["rentAmount", UInt],
+]);
 // payment date => rent
-const RentersPayment = Object({ rent: Rent, hasPayed: Bool });
+const RentersPayment = Struct([
+  ["rent", Rent],
+  ["hasPayed", Bool],
+]);
 
-const NewRentedNft = Object({
-  nftId: UInt,
-  owner: Address,
-  renter: Address,
-  rentAmount: UInt,
-  paymentDates: Array(UInt, 12), // maximum rent for 12 month
-});
+const NewRentedNft = Struct([
+  ["nftId", UInt],
+  ["owner", Address],
+  ["renter", Address],
+  ["rentAmount", UInt],
+  ["paymentDates", Array(UInt, 12)], // maximum rent for 12 month
+]);
 
 // Someone who has NFT
 const UserSchema = {
@@ -78,12 +81,9 @@ export const main = Reach.App(() => {
     })
     .invariant(true)
     .while(keepGoing)
-    .api(
-      Owner.rentNFT,
-      ({ nftId, owner, renter, rentAmount, paymentDates }) => {
-        rentByNftId(nftId, owner, renter, rentAmount, paymentDates);
-      }
-    );
+    .api(Owner.rentNFT, (_rentedNft) => {
+      rentByNftId(..._rentedNft);
+    });
 
   exit();
 });
