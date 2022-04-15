@@ -13,9 +13,13 @@ const NewRentedNft = Object({
   owner: Address,
   renter: Address,
   rentAmount: UInt,
-  paymentDates: Array(UInt, 7),
+  paymentDates: Array(UInt, 12), // maximum rent for 12 month
 });
 
+// Someone who has NFT
+const UserSchema = {
+  getRentedNft: Fun([UInt], NewRentedNft),
+};
 const OwnerSchema = {
   // nftId,owner,renter, renting amount, payment dates
   // should return bool if it succeeded
@@ -30,21 +34,56 @@ const RenterSchema = {
 };
 
 export const main = Reach.App(() => {
-  const Owner = Participant("Owner", {
+  const User = Participant("User", {
+    ...UserSchema,
+  });
+  const Owner = API("Owner", {
     ...OwnerSchema,
   });
-
-  const Renter = Participant("Renter", {
+  const Renter = API("Renter", {
     ...RenterSchema,
   });
 
   init();
-
-  Owner.publish();
+  User.only(() => {
+    const rentedNft = declassify(interact.getRentedNft(0));
+  });
+  User.publish(rentedNft);
+  const rentedNfts = new Map(UInt);
+  const rentersPayment = new Map(UInt);
   commit();
+  User.publish();
 
-  Renter.publish();
-  commit();
+  const [keepGoing] = parallelReduce([true])
+    .define(() => {
+      const rentByNftId = (nftId, owner, renter, rentAmount, paymentDates) => {
+        rentedNfts[nftId] = {
+          owner,
+          renter,
+          rentAmount,
+          paymentDates,
+        };
+        // transfer ownership
+        // nftIdByOwner[nftId] = renter;
+
+        for (let i = 0; i < paymentDates.length; paymentDates.length) {
+          rentersPayment[paymentDates[i]] = {
+            nftId,
+            renter,
+            rentAmount,
+            hasPayed: false,
+          };
+        }
+      };
+    })
+    .invariant(true)
+    .while(keepGoing)
+    .api(
+      Owner.rentNFT,
+      ({ nftId, owner, renter, rentAmount, paymentDates }) => {
+        rentByNftId(nftId, owner, renter, rentAmount, paymentDates);
+      }
+    );
 
   exit();
 });
